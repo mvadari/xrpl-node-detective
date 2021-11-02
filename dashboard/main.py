@@ -4,62 +4,73 @@ import curses
 
 NUM_COLORS = 7 # curses has 8, but white is one of them
 
+TABS = ["home", "setup", "peers", "consensus"]
+
 def init_colors():
     for i in range(NUM_COLORS):
         curses.init_pair(i+1, i, curses.COLOR_WHITE)
 
-def print_tabs(stdscr, tab_list: List[str], curr_tab) -> None:
-    column = 2
-    row = 10
+class Interface:
+    @classmethod
+    def start(cls, stdscr):
+        interface = cls(stdscr)
+        return interface.run()
 
-    for i in range(len(tab_list)):
-        tab = tab_list[i]
-        if(tab == curr_tab):
-            tab = '**' + tab + '**'
-        stdscr.addstr(column, row, tab, curses.color_pair((i+1) % NUM_COLORS))
-        row += len(tab) + 5
+    def __init__(self, stdscr) -> None:
+        self.stdscr = stdscr
+        curses.noecho()
+        init_colors()
+        self.stdscr.keypad(True)
+        # Clear screen
+        self.stdscr.clear()
+        
+        # print tabs
+        self.curr_tab = TABS[0]
+        self.print_tabs()
+        self.stdscr.refresh()
 
-def main(stdscr):
-    curses.noecho()
-    init_colors()
-    stdscr.keypad(True)
-    # Clear screen
-    stdscr.clear()
+    def run(self):
+        c = self.stdscr.getkey()
+        while(c != 'q'):
+            if(c == 'q'):
+                break
+            
+            self.handle_key(c)
+
+            self.stdscr.refresh()
+
+            c = self.stdscr.getkey()
     
-    tabs = ["home", "setup", "peers", "consensus"]
-    curr_tab = tabs[0]
-    print_tabs(stdscr, tabs, curr_tab)
-    stdscr.refresh()
+    def print_tabs(self) -> None:
+        column = 2
+        row = 10
 
-    stdscr.keypad(True)
-    c = stdscr.getkey()
-    while(c != 'q'):
+        for i in range(len(TABS)):
+            tab = TABS[i]
+            if(tab == self.curr_tab):
+                tab = '**' + tab + '**'
+            self.stdscr.addstr(column, row, tab, curses.color_pair((i+1) % NUM_COLORS))
+            row += len(tab) + 5
+    
+    def handle_key(self, c: str) -> None:
         if(c == 'KEY_LEFT'):
-            stdscr.clear()
-            curr_tab = tabs[tabs.index(curr_tab) - 1]
-            print_tabs(stdscr, tabs, curr_tab)
-            stdscr.refresh()
+            self.stdscr.clear()
+            self.curr_tab = TABS[TABS.index(self.curr_tab) - 1]
+            self.print_tabs()
+            self.stdscr.refresh()
 
         if(c == 'KEY_RIGHT'):
-            stdscr.clear()
-            index = tabs.index(curr_tab)
-            if(index + 1 >= len(tabs)):
-                curr_tab = tabs[0]
+            self.stdscr.clear()
+            index = TABS.index(self.curr_tab)
+            if(index + 1 >= len(TABS)):
+                self.curr_tab = TABS[0]
             else:
-                curr_tab = tabs[index + 1]
-            print_tabs(stdscr, tabs, curr_tab)
-            stdscr.refresh()
-
-
-        if(c == 'q'):
-            break
-
-        stdscr.refresh()
-
-        c = stdscr.getkey()
+                self.curr_tab = TABS[index + 1]
+            self.print_tabs()
+            self.stdscr.refresh()
 
 
 if __name__ == "__main__":
-    curses.wrapper(main)
+    curses.wrapper(Interface.start)
 
 
