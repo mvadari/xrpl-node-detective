@@ -120,13 +120,17 @@ def format_row(column_widths, entries):
 
 def format_response_for_display(response: dict[str, any]) -> List[str]:
     if(response == None or response['result']['peers'] == None):
-        return ['Currently no peers are connected.']
+        formatted_lines = ['Currently no peers are connected.']
+        return formatted_lines
     else:
         peers = response['result']['peers']
         formatted_lines: List[str] = []
 
         formatted_lines.append(f"Total peers: {len(peers)}")
         formatted_lines.append("")
+
+        for i in range(20):
+            formatted_lines.append("")
 
         column_widths = [40, 80, 120]
         header = ['name/ip address', 'status', 'completed ledgers']
