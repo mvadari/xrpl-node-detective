@@ -32,10 +32,8 @@ def parsePort(fp):
     ip = None
     while line:
         if 'port' in line and len(line.split('=')) > 1:
-            print(line)
             port = line.split('=')[1].strip()
         elif 'ip' in line:
-            print(line)
             ip = line.split('=')[1].strip()
 
         if port and ip:
@@ -47,7 +45,6 @@ def findPort():
     relative = '.config/ripple/rippled.cfg'
     home = os.getenv('HOME')
     filepath = os.path.join(home, relative)
-    print(filepath)
     with open(filepath) as fp:
         line = fp.readline()
         while line:
@@ -83,5 +80,7 @@ def connect(stdscr):
     time.sleep(1)
     checkHealth(stdscr, adminPort, 4)
     displayTitle(stdscr, msg="Connected, starting application")
+    time.sleep(1)
+    stdscr.clear()
     # TODO: PUT app.start(adminPort) here
 
