@@ -1,6 +1,7 @@
 from typing import List
 
 import curses
+import peers
 
 from dashboard.config import generate_config_screen
 
@@ -50,6 +51,9 @@ class Interface:
     def print_current_tab(self):
         if self.curr_tab == "config":
             generate_config_screen(self.stdscr)
+        elif(self.curr_tab == "peers"):
+            formatted = peers.get_formatted_peers()
+            print_section("peers", formatted, self.stdscr, 5, 10)
     
     def print_tabs(self) -> None:
         column = 2
@@ -73,6 +77,19 @@ class Interface:
             else:
                 self.curr_tab = TABS[index + 1]
 
+
+def print_section(section_name: str, return_lines: List[str], stdscr, row: int, column: int):
+    stdscr.addstr(row, column, f"***{section_name.upper()}***", curses.color_pair(1))
+    row += 2
+
+    for line in return_lines:
+        color_pair = 1
+        if "Error" in line:
+            color_pair = 2
+        stdscr.addstr(row, column, line, curses.color_pair(color_pair))
+        row += 1
+    row += 1
+    return (row, column)
 
 if __name__ == "__main__":
     curses.wrapper(Interface.start)
