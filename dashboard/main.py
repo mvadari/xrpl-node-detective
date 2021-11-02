@@ -13,10 +13,12 @@ def init_colors():
         curses.init_pair(i+1, i, curses.COLOR_WHITE)
 
 class Interface:
-    def __init__(self) -> None:
-        pass
+    @classmethod
+    def start(cls, stdscr):
+        interface = cls(stdscr)
+        return interface.run()
 
-    def run(self, stdscr):
+    def __init__(self, stdscr) -> None:
         self.stdscr = stdscr
         curses.noecho()
         init_colors()
@@ -27,7 +29,7 @@ class Interface:
         self.print_tabs(curr_tab)
         self.stdscr.refresh()
 
-        self.stdscr.keypad(True)
+    def run(self):
         c = self.stdscr.getkey()
         while(c != 'q'):
             if(c == 'q'):
@@ -70,7 +72,6 @@ class Interface:
 
 
 if __name__ == "__main__":
-    interface = Interface()
-    curses.wrapper(interface.run)
+    curses.wrapper(Interface.start)
 
 
