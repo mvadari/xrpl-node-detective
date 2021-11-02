@@ -1,18 +1,25 @@
+from typing import List
+
 import curses
 
-def run(stdscr):
+def print_tabs(stdscr, tab_list: List[str]) -> None:
+    column = 2
+    row = 10
+
+    for tab in tab_list:
+        stdscr.addstr(column, row, tab, curses.A_REVERSE)
+        row += len(tab) + 5
+
+def main(stdscr):
     curses.noecho()
+    stdscr.keypad(True)
     # Clear screen
     stdscr.clear()
-
-    stdscr.addstr(0, 0, "Hello world",
-              curses.A_REVERSE)
+    
+    print_tabs(stdscr, ["setup", "peers", "consensus"])
 
     stdscr.refresh()
     stdscr.getkey()
 
-def main():
-    curses.wrapper(run)
-
 if __name__ == "__main__":
-    main()
+    curses.wrapper(main)
