@@ -91,7 +91,7 @@ class Interface:
         if c == 'KEY_DOWN' and self.pos < self.stdscr.getyx()[0] - self.height - 1:
             self.pos += 1
             self.refresh()
-        elif c == 'KEY_UP' and self.pos > -2:
+        elif c == 'KEY_UP' and self.pos > 0:
             self.pos -= 1
             self.refresh()
 
