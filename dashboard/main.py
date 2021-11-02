@@ -6,8 +6,6 @@ NUM_COLORS = 7 # curses has 8, but white is one of them
 
 TABS = ["home", "setup", "peers", "consensus"]
 
-curr_tab = TABS[0]
-
 def init_colors():
     for i in range(NUM_COLORS):
         curses.init_pair(i+1, i, curses.COLOR_WHITE)
@@ -26,7 +24,9 @@ class Interface:
         # Clear screen
         self.stdscr.clear()
         
-        self.print_tabs(curr_tab)
+        # print tabs
+        self.curr_tab = TABS[0]
+        self.print_tabs()
         self.stdscr.refresh()
 
     def run(self):
@@ -41,33 +41,32 @@ class Interface:
 
             c = self.stdscr.getkey()
     
-    def print_tabs(self, curr_tab) -> None:
+    def print_tabs(self) -> None:
         column = 2
         row = 10
 
         for i in range(len(TABS)):
             tab = TABS[i]
-            if(tab == curr_tab):
+            if(tab == self.curr_tab):
                 tab = '**' + tab + '**'
             self.stdscr.addstr(column, row, tab, curses.color_pair((i+1) % NUM_COLORS))
             row += len(tab) + 5
     
     def handle_key(self, c: str) -> None:
-        global curr_tab
         if(c == 'KEY_LEFT'):
             self.stdscr.clear()
-            curr_tab = TABS[TABS.index(curr_tab) - 1]
-            self.print_tabs(curr_tab)
+            self.curr_tab = TABS[TABS.index(self.curr_tab) - 1]
+            self.print_tabs()
             self.stdscr.refresh()
 
         if(c == 'KEY_RIGHT'):
             self.stdscr.clear()
-            index = TABS.index(curr_tab)
+            index = TABS.index(self.curr_tab)
             if(index + 1 >= len(TABS)):
-                curr_tab = TABS[0]
+                self.curr_tab = TABS[0]
             else:
-                curr_tab = TABS[index + 1]
-            self.print_tabs(curr_tab)
+                self.curr_tab = TABS[index + 1]
+            self.print_tabs()
             self.stdscr.refresh()
 
 
