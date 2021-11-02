@@ -108,6 +108,12 @@ class ConfigFile:
         except KeyError:
             raise AttributeError(name)
     
+    def __getitem__(self, name):
+        try:
+            return self._sections[name]
+        except KeyError:
+            raise AttributeError(name)
+    
     def __repr__(self):
         return str([self._file_name, self._sections])
     
