@@ -2,6 +2,7 @@ import curses
 from pprint import pprint
 import textwrap
 from typing import List
+import pathlib
 
 from .config_file import ConfigFile
 
@@ -109,10 +110,21 @@ def parse_validator(config_file):
     return return_lines
 
 def parse_amendments(config_file):
+    return_lines = []
     if "features" not in config_file._sections:
         return ["Error: no amendments on this node"]
-    return config_file["features"].get_lines()
+
+    config_amendments = config_file["features"].get_lines()
+    current_directory = pathlib.Path(__file__).parent.resolve()
+    with open(current_directory.joinpath('amendments.txt')) as file:
+        lines = file.readlines()
+        valid_amendments = set(line.rstrip() for line in lines)
+
+    for amendment in valid_amendments:
+        if amendment not in config_amendments:
+            return_lines.append(f"Error: amendment f{amendment} not in list")
+    return return_lines + config_amendments
 
 
 if __name__ == "__main__":
-    print(ConfigFile(filename))
+    print(parse_amendments(ConfigFile(filename)))
