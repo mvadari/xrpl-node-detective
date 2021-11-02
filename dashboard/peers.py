@@ -102,9 +102,10 @@ def request_peers():
         return None
     else: 
         json_content = json.loads(response._content.decode('utf-8'))
-        #return json_content
-        return dummy_reponse
-
+        
+        #TODO: For the demo, return dummy_content here
+        return json_content
+        
 def format_row(column_widths, entries):
     line = ""
     for i in range(len(entries)):
