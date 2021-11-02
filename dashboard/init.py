@@ -71,16 +71,41 @@ def checkHealth(stdscr, addr, attempts):
     time.sleep(.5)
     checkHealth(stdscr, addr, attempts - 1)
 
+def waitForSync(stdscr, addr):
+    data = json.dumps({"method": "server_info"})
+    headers = {'content-type': "application/json"}
+    while True:
+        r = None
+        try:
+            r = requests.post("http://" + addr, data=data, headers=headers)
+            print(r.status_code)
+
+        except:
+            None
+
+        if r and r.status_code == 200:
+            response = json.loads(r.text)
+            state = response["result"]["info"]["server_state"] 
+            if (state == "proposing" or state == "full" or state == "validating"):
+                return
+            else:
+                displayTitle(stdscr, msg="Please wait, server is syncing, this can take up to 15 minutes")
+
+        time.sleep(10)
+
 
 def connect(stdscr):
     displayTitle(stdscr, msg="Validator Dashboard")
-    adminPort = findPort()
+    admin = findPort()
     time.sleep(1)
-    displayTitle(stdscr, msg=("Connecting to " + adminPort))
+    displayTitle(stdscr, msg=("Connecting to " + admin))
     time.sleep(1)
-    checkHealth(stdscr, adminPort, 4)
+    checkHealth(stdscr, admin, 4)
     displayTitle(stdscr, msg="Connected, starting application")
     time.sleep(1)
-    stdscr.clear()
+    waitForSync(stdscr, admin)
     # TODO: PUT app.start(adminPort) here
+    displayTitle(stdscr, msg="Server is synced")
+
+    stdscr.clear()
 
