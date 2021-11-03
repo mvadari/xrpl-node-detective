@@ -15,6 +15,10 @@ NUM_COLORS = 256 # curses has 8, but white is one of them
 TABS = ["home", "setup", "peers", "consensus", "config", "unl"]
 
 def init_colors():
+    for i in range(NUM_COLORS):
+        curses.init_pair(i+1, i, curses.COLOR_WHITE)
+
+def alternate_init_colors():
     curses.start_color()
     curses.use_default_colors()
     for i in range(0, curses.COLORS):
@@ -56,8 +60,6 @@ class Interface:
         # State for time-based events
         self.last_sync_check = 0
         self.sync_status = "unchecked"
-
-        connect(stdscr)
         
         # print tabs
         self.curr_tab = TABS[0]
