@@ -45,11 +45,9 @@ class Interface:
         self.max_rows = 32767
         self.stdscr = curses.newpad(mypad_height, self.width)
         self.stdscr.scrollok(1)
-
-
-        curses.noecho()
         init_colors()
         self.stdscr.keypad(True)
+
         # Clear screen
         self.stdscr.clear()
         
@@ -131,8 +129,8 @@ class Interface:
             row += len(tab) + 5
     
     def handle_key(self, c: str) -> None:
-        #Handle scrolling
-        if c == 'KEY_DOWN' and self.pos < self.stdscr.getyx()[0] - self.height - 1:
+        #TODO: Investigate why vertical scrolling is not updating
+        if c == 'KEY_DOWN' and self.pos < self.original_scr.getyx()[0] - self.original_scr.getmaxyx()[0] - 1:
             self.pos += 1
         elif c == 'KEY_UP' and self.pos > 0:
             self.pos -= 1
