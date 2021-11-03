@@ -4,13 +4,19 @@ import textwrap
 from typing import List
 import pathlib
 
+from dotenv import dotenv_values
+
 from .config_file import ConfigFile
 
 accepted_protocols = ["http", "https", "ws", "wss", "peer"]
 
-filename = '/Users/mvadari/Documents/sidechain_config/main.no_shards.dog/rippled.cfg'
+env_config = dotenv_values('.env')
 
 def generate_config_screen(stdscr):
+    try:
+        filename = env_config["CONFIG_FILE"]
+    except KeyError:
+        stdscr.addstr(row, column, f"***ERROR: No `CONFIG_FILE` listed in `.env`***", curses.color_pair(2))
     max_rows, max_cols = stdscr.getmaxyx()
     column_width = (max_cols - 10) / 2 - 10
 
@@ -130,4 +136,4 @@ def parse_amendments(config_file):
 
 
 if __name__ == "__main__":
-    print(parse_amendments(ConfigFile(filename)))
+    print(env_config)
