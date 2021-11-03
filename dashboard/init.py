@@ -6,7 +6,7 @@ title =  ["""__  ______  ____    _     _____ ____   ____ _____ ____  """,
           """ /  \|  _ <|  __/  | |___| |___| |_| | |_| | |___|  _ < """,
           """/_/\_\_| \_\_|     |_____|_____|____/ \____|_____|_| \_\\"""]
 
-def displayTitle(interface, msg: str):
+def display_title(interface, msg: str):
     stdscr = interface.stdscr
     stdscr.clear()
 
@@ -54,9 +54,9 @@ def find_port():
             line = fp.readline()
 
 #TODO: Add this to the home screen UI
-def checkHealth(interface, addr: str, attempts: int):
+def check_health(interface, addr: str, attempts: int):
     if attempts == 0:
-        displayTitle(interface, msg = "Failed to connect, press 'q' to terminate")
+        display_title(interface, msg = "Failed to connect, press 'q' to terminate")
         return
 
     data = json.dumps({"method": "server_info"})
@@ -70,10 +70,10 @@ def checkHealth(interface, addr: str, attempts: int):
         pass
 
     time.sleep(.5)
-    checkHealth(interface, addr, attempts - 1)
+    check_health(interface, addr, attempts - 1)
 
 #If not synced, returns a time to check again
-def checkIfSynced():
+def check_if_synced():
     data = json.dumps({"method": "server_info"})
     headers = {'content-type': "application/json"}
     r = None
@@ -92,17 +92,17 @@ def checkIfSynced():
 
 #TODO: Add this nice boot up animation to the Home interface
 def connect(interface):
-    displayTitle(interface, msg="Validator Dashboard")
+    display_title(interface, msg="Validator Dashboard")
     admin = find_port()
     time.sleep(1)
-    displayTitle(interface, msg=("Connecting to " + admin))
+    display_title(interface, msg=("Connecting to " + admin))
     time.sleep(1)
-    checkHealth(interface, admin, 4)
-    displayTitle(interface, msg="Connected, starting application")
+    check_health(interface, admin, 4)
+    display_title(interface, msg="Connected, starting application")
     time.sleep(1)
-    checkIfSynced(interface, admin)
+    check_if_synced(interface, admin)
     # TODO: PUT app.start(adminPort) here
-    displayTitle(interface, msg="Server is synced")
+    display_title(interface, msg="Server is synced")
 
     interface.stdscr.clear()
 

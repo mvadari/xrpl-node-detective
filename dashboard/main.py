@@ -3,7 +3,7 @@ from typing import List
 
 import curses
 import dashboard.peers as peers
-from dashboard.init import checkIfSynced, title, connect, displayTitle
+from dashboard.init import check_if_synced, title
 
 from dashboard.config import generate_config_screen
 from dashboard.peers import get_formatted_peers
@@ -95,11 +95,11 @@ class Interface:
 
     
     def check_for_time_events(self):
-        if(not(self.isSynced()) and self.last_sync_check + 10 < time.time()):
-            self.sync_status = checkIfSynced()
+        if(not(self.is_synced()) and self.last_sync_check + 10 < time.time()):
+            self.sync_status = check_if_synced()
             self.last_sync_check = time.time()
 
-    def isSynced(self):
+    def is_synced(self):
         return (self.sync_status == "proposing") or (self.sync_status == "full") or (self.sync_status == "validating")
 
     def print_current_tab(self):
