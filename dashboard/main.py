@@ -2,9 +2,11 @@ from typing import List
 
 import curses
 
+from dashboard.config import generate_config_screen
+
 NUM_COLORS = 7 # curses has 8, but white is one of them
 
-TABS = ["home", "setup", "peers", "consensus"]
+TABS = ["home", "setup", "peers", "consensus", "config"]
 
 def init_colors():
     for i in range(NUM_COLORS):
@@ -27,19 +29,27 @@ class Interface:
         # print tabs
         self.curr_tab = TABS[0]
         self.print_tabs()
+        self.print_current_tab()
         self.stdscr.refresh()
 
     def run(self):
         c = self.stdscr.getkey()
         while(c != 'q'):
+            self.stdscr.clear()
             if(c == 'q'):
                 break
             
             self.handle_key(c)
 
+            self.print_tabs()
+            self.print_current_tab()
             self.stdscr.refresh()
 
             c = self.stdscr.getkey()
+    
+    def print_current_tab(self):
+        if self.curr_tab == "config":
+            generate_config_screen(self.stdscr)
     
     def print_tabs(self) -> None:
         column = 2
@@ -54,20 +64,14 @@ class Interface:
     
     def handle_key(self, c: str) -> None:
         if(c == 'KEY_LEFT'):
-            self.stdscr.clear()
             self.curr_tab = TABS[TABS.index(self.curr_tab) - 1]
-            self.print_tabs()
-            self.stdscr.refresh()
 
         if(c == 'KEY_RIGHT'):
-            self.stdscr.clear()
             index = TABS.index(self.curr_tab)
             if(index + 1 >= len(TABS)):
                 self.curr_tab = TABS[0]
             else:
                 self.curr_tab = TABS[index + 1]
-            self.print_tabs()
-            self.stdscr.refresh()
 
 
 if __name__ == "__main__":
