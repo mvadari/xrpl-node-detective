@@ -12,7 +12,7 @@ from dashboard.init import connect
 
 NUM_COLORS = 256 # curses has 8, but white is one of them
 
-TABS = ["home", "setup", "peers", "consensus", "config", "unl"]
+TABS = ["home", "peers", "config", "unl"]
 
 def init_colors():
     for i in range(NUM_COLORS):
@@ -48,7 +48,7 @@ class Interface:
         self.max_rows = 32767
         self.stdscr = curses.newpad(mypad_height, self.width)
         self.stdscr.scrollok(1)
-        init_colors()
+        alternate_init_colors()
         self.stdscr.keypad(True)
 
         # Clear screen
@@ -125,7 +125,7 @@ class Interface:
             tab = TABS[i]
             if(tab == self.curr_tab):
                 tab = '**' + tab + '**'
-            self.stdscr.addstr(column, row, tab, curses.color_pair((i+1) % NUM_COLORS))
+            self.stdscr.addstr(column, row, tab, curses.color_pair(7))
             row += len(tab) + 5
     
     def handle_key(self, c: str) -> None:
@@ -147,11 +147,11 @@ class Interface:
 
 
 def print_section(section_name: str, return_lines: List[str], stdscr, row: int, column: int):
-    stdscr.addstr(row, column, f"***{section_name.upper()}***", curses.color_pair(1))
+    stdscr.addstr(row, column, f"***{section_name.upper()}***", curses.color_pair(3))
     row += 2
 
     for line in return_lines:
-        color_pair = 1
+        color_pair = 4
         if "Error" in line:
             color_pair = 2
         stdscr.addstr(row, column, line, curses.color_pair(color_pair))

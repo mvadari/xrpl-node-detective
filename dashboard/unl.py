@@ -58,7 +58,7 @@ def print_section(section_name: str, return_lines: List[str], stdscr, row: int, 
     row += 2
 
     for line in return_lines:
-        color_pair = 1
+        color_pair = 4
         if "Error" in line:
             color_pair = 2
         stdscr.addstr(row, column, line, curses.color_pair(color_pair))

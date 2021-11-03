@@ -37,10 +37,11 @@ def print_section(section_name: str, return_lines: List[str], stdscr, row: int, 
     stdscr.addstr(row, column, f"***{section_name.upper()}***", curses.color_pair(3))
     row += 2
 
+    
     for line in return_lines:
-        color_pair = 1
+        color_pair = 4 # Yellow
         if "Error" in line:
-            color_pair = 2
+            color_pair = 2 # Red
         stdscr.addstr(row, column, line, curses.color_pair(color_pair))
         row += 1
     row += 2
