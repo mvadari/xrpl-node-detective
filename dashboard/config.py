@@ -82,7 +82,7 @@ def parse_peers(config_file):
             elif len(splt) == 1:
                 return_lines.append(splt[0])
     else:
-        return_lines.append("Error: no [ips] section detected - not connected to any network")
+        return_lines.append("No [ips] section detected - connected to mainnet (or standalone)")
     
     if "ips_fixed" in config_file._sections:
         ip_fixed_config = config_file["ips_fixed"]
@@ -124,18 +124,13 @@ def parse_validator(config_file):
 def parse_amendments(config_file):
     return_lines = []
     if "features" not in config_file._sections:
-        return ["Error: no amendments on this node"]
-
-    config_amendments = config_file["features"].get_lines()
-    current_directory = pathlib.Path(__file__).parent.resolve()
-    with open(current_directory.joinpath('amendments.txt')) as file:
-        lines = file.readlines()
-        valid_amendments = set(line.rstrip() for line in lines)
-
-    for amendment in valid_amendments:
-        if amendment not in config_amendments:
-            return_lines.append(f"Error: amendment f{amendment} not in list")
-    return return_lines + config_amendments
+        return_lines.append("No amendments on this node (expected)")
+    else:
+        config_amendments = config_file["features"].get_lines()
+        return_lines.append("Amendments are okay on devnet or in standalone mode")
+        return_lines += config_amendments
+    
+    return return_lines
 
 
 if __name__ == "__main__":
