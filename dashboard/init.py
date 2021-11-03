@@ -52,7 +52,7 @@ def find_port():
                 return parse_port(fp)
             line = fp.readline()
 
-def checkHealth(stdscr, addr, attempts):
+def check_health(stdscr, addr, attempts):
     if attempts == 0:
         display_title(stdscr, msg = "Failed to connect, press any key to terminate")
         return
@@ -62,14 +62,13 @@ def checkHealth(stdscr, addr, attempts):
     r = None
     try:
         r = requests.post("http://" + addr, data=data, headers=headers)
-        print(r.status_code)
         if r and r.status_code == 200:
             return
     except:
-        None
+        pass
 
     time.sleep(.5)
-    checkHealth(stdscr, addr, attempts - 1)
+    check_health(stdscr, addr, attempts - 1)
 
 def wait_for_sync(stdscr, addr):
     data = json.dumps({"method": "server_info"})
@@ -78,10 +77,8 @@ def wait_for_sync(stdscr, addr):
         r = None
         try:
             r = requests.post("http://" + addr, data=data, headers=headers)
-            print(r.status_code)
-
         except:
-            None
+            pass
 
         if r and r.status_code == 200:
             response = json.loads(r.text)
@@ -89,7 +86,7 @@ def wait_for_sync(stdscr, addr):
             if (state == "proposing" or state == "full" or state == "validating"):
                 return
             else:
-                displayTitle(stdscr, msg="Please wait, server is syncing, this can take up to 15 minutes")
+                display_title(stdscr, msg="Please wait, server is syncing, this can take up to 15 minutes")
 
         time.sleep(10)
 
@@ -100,7 +97,7 @@ def connect(stdscr):
     time.sleep(1)
     display_title(stdscr, msg=("Connecting to " + admin))
     time.sleep(1)
-    checkHealth(stdscr, admin, 4)
+    check_health(stdscr, admin, 4)
     display_title(stdscr, msg="Connected, starting application")
     time.sleep(1)
     wait_for_sync(stdscr, admin)
