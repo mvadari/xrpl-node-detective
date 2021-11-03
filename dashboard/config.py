@@ -13,6 +13,8 @@ accepted_protocols = ["http", "https", "ws", "wss", "peer"]
 env_config = dotenv_values('.env')
 
 def generate_config_screen(stdscr):
+    row = 5
+    column = 10
     try:
         filename = env_config["CONFIG_FILE"]
     except KeyError:
@@ -20,11 +22,11 @@ def generate_config_screen(stdscr):
         return
     max_rows, max_cols = stdscr.getmaxyx()
     column_width = (max_cols - 10) / 2 - 10
-
-    row = 5
-    column = 10
-
-    config_file = ConfigFile(filename)
+    try:
+        config_file = ConfigFile(filename)
+    except FileNotFoundError:
+        stdscr.addstr(row, column, f"***ERROR: {filename} does not exist", curses.color_pair(2))
+        return
 
     row, column = print_section("ports", parse_ports(config_file, column_width), stdscr, row, column)
     row, column = print_section("peers", parse_peers(config_file), stdscr, row, column)
