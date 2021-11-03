@@ -129,9 +129,6 @@ def format_response_for_display(response: dict[str, any]) -> List[str]:
         formatted_lines.append(f"Total peers: {len(peers)}")
         formatted_lines.append("")
 
-        for i in range(20):
-            formatted_lines.append("")
-
         column_widths = [40, 80, 120]
         header = ['name/ip address', 'status', 'completed ledgers']
         formatted_lines.append(format_row(column_widths, header))
