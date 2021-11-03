@@ -6,13 +6,17 @@ from dashboard.config import generate_config_screen
 from dashboard.peers import get_formatted_peers
 from dashboard.unl import unl_screen
 
-NUM_COLORS = 7 # curses has 8, but white is one of them
+from dashboard.init import connect
+
+NUM_COLORS = 256 # curses has 8, but white is one of them
 
 TABS = ["home", "setup", "peers", "consensus", "config", "unl"]
 
 def init_colors():
-    for i in range(NUM_COLORS):
-        curses.init_pair(i+1, i, curses.COLOR_WHITE)
+    curses.start_color()
+    curses.use_default_colors()
+    for i in range(0, curses.COLORS):
+        curses.init_pair(i + 1, i, -1) 
 
 class Interface:
     @classmethod
@@ -42,6 +46,8 @@ class Interface:
         self.stdscr.keypad(True)
         # Clear screen
         self.stdscr.clear()
+
+        connect(stdscr)
         
         # print tabs
         self.curr_tab = TABS[0]
