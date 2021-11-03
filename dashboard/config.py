@@ -82,7 +82,7 @@ def parse_peers(config_file):
             elif len(splt) == 1:
                 return_lines.append(splt[0])
     else:
-        return_lines.append("Error: no [ips] section detected")
+        return_lines.append("Error: no [ips] section detected - not connected to any network")
     
     if "ips_fixed" in config_file._sections:
         ip_fixed_config = config_file["ips_fixed"]
