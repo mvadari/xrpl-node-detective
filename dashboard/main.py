@@ -51,8 +51,7 @@ class Interface:
     #Allows us to use a Pad as if it were a Window by always maintaining the same height and width
     #Call this instead of self.stdscr.refresh()
     def refresh(self):
-        height, width = self.stdscr.getyx()
-        self.stdscr.refresh(self.pos + 2, 0, 0, 0, height - 1, width - 1)
+        self.stdscr.refresh(self.pos + 2, 0, 0, 0, self.height - 1, self.width - 1)
         
     def run(self):
         c = self.stdscr.getkey()
@@ -64,6 +63,7 @@ class Interface:
             self.handle_key(c)
 
             self.print_tabs()
+            self.refresh()
             self.print_current_tab()
             self.refresh()
             try:
@@ -93,10 +93,8 @@ class Interface:
         #Handle scrolling
         if c == 'KEY_DOWN' and self.pos < self.stdscr.getyx()[0] - self.height - 1:
             self.pos += 1
-            self.refresh()
         elif c == 'KEY_UP' and self.pos > 0:
             self.pos -= 1
-            self.refresh()
 
         if(c == 'KEY_LEFT'):
             self.curr_tab = TABS[TABS.index(self.curr_tab) - 1]
