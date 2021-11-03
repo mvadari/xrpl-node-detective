@@ -104,11 +104,11 @@ class Interface:
     def print_current_tab(self):
         if self.curr_tab == "config":
             generate_config_screen(self.stdscr)
-        if(self.curr_tab == "peers"):
+        elif(self.curr_tab == "peers"):
             print_section("peers", get_formatted_peers(), self.stdscr, 5, 10)
         elif self.curr_tab == "unl":
             unl_screen(self.stdscr)
-        if(self.curr_tab == "home"):
+        elif(self.curr_tab == "home"):
             formatted = []
             formatted.extend(title)
             #TODO: Add more specific messages based on the status, rather than just displaying the status
