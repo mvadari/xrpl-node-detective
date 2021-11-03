@@ -2,7 +2,7 @@ from typing import List
 
 import curses
 
-from init import connect
+from dashboard.init import connect
 
 NUM_COLORS = 256 # curses has 8, but white is one of them
 

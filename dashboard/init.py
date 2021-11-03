@@ -6,7 +6,7 @@ title =  ["""__  ______  ____    _     _____ ____   ____ _____ ____  """,
           """ /  \|  _ <|  __/  | |___| |___| |_| | |_| | |___|  _ < """,
           """/_/\_\_| \_\_|     |_____|_____|____/ \____|_____|_| \_\\"""]
 
-def displayTitle(stdscr, msg):
+def display_title(stdscr, msg):
     stdscr.clear()
 
     for i,line in enumerate(title): 
@@ -26,7 +26,7 @@ def displayTitle(stdscr, msg):
     stdscr.refresh()
     curses.curs_set(0)
 
-def parsePort(fp):
+def parse_port(fp):
     line = fp.readline()
     port = None
     ip = None
@@ -41,7 +41,7 @@ def parsePort(fp):
 
         line = fp.readline()
 
-def findPort():
+def find_port():
     relative = '.config/ripple/rippled.cfg'
     home = os.getenv('HOME')
     filepath = os.path.join(home, relative)
@@ -49,12 +49,12 @@ def findPort():
         line = fp.readline()
         while line:
             if '[port_rpc_admin_local]' in line:
-                return parsePort(fp)
+                return parse_port(fp)
             line = fp.readline()
 
 def checkHealth(stdscr, addr, attempts):
     if attempts == 0:
-        displayTitle(stdscr, msg = "Failed to connect, press any key to terminate")
+        display_title(stdscr, msg = "Failed to connect, press any key to terminate")
         return
 
     data = json.dumps({"method": "server_info"})
@@ -71,7 +71,7 @@ def checkHealth(stdscr, addr, attempts):
     time.sleep(.5)
     checkHealth(stdscr, addr, attempts - 1)
 
-def waitForSync(stdscr, addr):
+def wait_for_sync(stdscr, addr):
     data = json.dumps({"method": "server_info"})
     headers = {'content-type': "application/json"}
     while True:
@@ -95,17 +95,17 @@ def waitForSync(stdscr, addr):
 
 
 def connect(stdscr):
-    displayTitle(stdscr, msg="Validator Dashboard")
-    admin = findPort()
+    display_title(stdscr, msg="Validator Dashboard")
+    admin = find_port()
     time.sleep(1)
-    displayTitle(stdscr, msg=("Connecting to " + admin))
+    display_title(stdscr, msg=("Connecting to " + admin))
     time.sleep(1)
     checkHealth(stdscr, admin, 4)
-    displayTitle(stdscr, msg="Connected, starting application")
+    display_title(stdscr, msg="Connected, starting application")
     time.sleep(1)
-    waitForSync(stdscr, admin)
+    wait_for_sync(stdscr, admin)
     # TODO: PUT app.start(adminPort) here
-    displayTitle(stdscr, msg="Server is synced")
+    display_title(stdscr, msg="Server is synced")
 
     stdscr.clear()
 
