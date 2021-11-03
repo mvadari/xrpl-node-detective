@@ -90,6 +90,7 @@ dummy_reponse =    {
 }
 
 # Returns the result of a rippled 'peers' request or None if unable to retrieve that data
+# Throws if there is no node running because there's nothing at the port_rpc_admin_local
 def request_peers():
     request = {
         "id": 2,
@@ -105,7 +106,7 @@ def request_peers():
         
         #TODO: For the demo, return dummy_content here
         return json_content
-        
+
 def format_row(column_widths, entries):
     line = ""
     for i in range(len(entries)):
@@ -150,4 +151,7 @@ def format_response_for_display(response: dict[str, any]) -> List[str]:
         return formatted_lines
 
 def get_formatted_peers():
-    return format_response_for_display(request_peers())
+    try:
+        return format_response_for_display(request_peers())
+    except:
+        return ["Error: Unable to connect to the rippled local admin rpc port to check for peers. Check if your node is running."]

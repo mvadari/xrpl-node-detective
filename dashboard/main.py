@@ -1,7 +1,7 @@
 from typing import List
 
 import curses
-import peers
+import dashboard.peers as peers
 
 from dashboard.config import generate_config_screen
 
