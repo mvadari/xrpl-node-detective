@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Dict, List
 import requests
 import json
 
@@ -118,7 +118,7 @@ def format_row(column_widths, entries):
 
     return line
 
-def format_response_for_display(response: dict[str, any]) -> List[str]:
+def format_response_for_display(response: Dict[str, Any]) -> List[str]:
     if(response == None or response['result']['peers'] == None):
         return ['Currently no peers are connected.']
     else:

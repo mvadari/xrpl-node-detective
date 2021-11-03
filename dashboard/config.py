@@ -2,11 +2,10 @@ import curses
 from pprint import pprint
 import textwrap
 from typing import List
-import pathlib
 
 from dotenv import dotenv_values
 
-from .config_file import ConfigFile
+from dashboard.config_file import ConfigFile
 
 accepted_protocols = ["http", "https", "ws", "wss", "peer"]
 
