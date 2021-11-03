@@ -51,7 +51,8 @@ class Interface:
     #Allows us to use a Pad as if it were a Window by always maintaining the same height and width
     #Call this instead of self.stdscr.refresh()
     def refresh(self):
-        self.stdscr.refresh(self.pos + 2, 0, 0, 0, self.height - 1, self.width - 1)
+        height, width = self.stdscr.getyx()
+        self.stdscr.refresh(self.pos + 2, 0, 0, 0, height - 1, width - 1)
         
     def run(self):
         c = self.stdscr.getkey()
@@ -65,8 +66,10 @@ class Interface:
             self.print_tabs()
             self.print_current_tab()
             self.refresh()
-
-            c = self.stdscr.getkey()
+            try:
+                c = self.stdscr.getkey()
+            except:
+                c = "NO_INPUT"
     
     def print_current_tab(self):
         if self.curr_tab == "config":
