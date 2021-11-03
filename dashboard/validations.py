@@ -37,7 +37,7 @@ def validation_screen(stdscr):
     
     # TODO: add check for [validators]
 
-    row, column = print_section("validators", get_validator_list(str(complete_validation_file)), stdscr, row, column)
+    row, column = print_section("url", get_validator_list(str(complete_validation_file)), stdscr, row, column)
 
 def get_validator_list(filename):
     validator_config = ConfigFile(filename)
