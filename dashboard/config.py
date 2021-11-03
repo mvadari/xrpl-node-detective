@@ -63,14 +63,17 @@ def parse_ports(config_file, column_width: int):
 def parse_peers(config_file):
     return_lines = []
     ip_config = config_file["ips"]
-    for line in ip_config.get_lines():
-        splt = line.split()
-        if len(splt) > 2:
-            return_lines.append(f"Error: too many items in this line: {line}")
-        elif len(splt) == 2:
-            return_lines.append(":".join(splt))
-        elif len(splt) == 1:
-            return_lines.append(splt[0])
+    if "ips" in config_file._sections:
+        for line in ip_config.get_lines():
+            splt = line.split()
+            if len(splt) > 2:
+                return_lines.append(f"Error: too many items in this line: {line}")
+            elif len(splt) == 2:
+                return_lines.append(":".join(splt))
+            elif len(splt) == 1:
+                return_lines.append(splt[0])
+    else:
+        return_lines.append("Error: no [ips] section detected")
     
     if "ips_fixed" in config_file._sections:
         ip_fixed_config = config_file["ips_fixed"]
