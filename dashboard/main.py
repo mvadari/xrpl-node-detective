@@ -63,7 +63,6 @@ class Interface:
             self.handle_key(c)
 
             self.print_tabs()
-            self.refresh()
             self.print_current_tab()
             self.refresh()
             try:
