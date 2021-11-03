@@ -17,6 +17,7 @@ def generate_config_screen(stdscr):
         filename = env_config["CONFIG_FILE"]
     except KeyError:
         stdscr.addstr(row, column, f"***ERROR: No `CONFIG_FILE` listed in `.env`***", curses.color_pair(2))
+        return
     max_rows, max_cols = stdscr.getmaxyx()
     column_width = (max_cols - 10) / 2 - 10
 
