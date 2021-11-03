@@ -1,6 +1,8 @@
+import time
 from typing import List
 
 import curses
+from dashboard.init import check_if_synced, title
 
 from dashboard.config import generate_config_screen
 from dashboard.peers import get_formatted_peers
@@ -13,6 +15,10 @@ NUM_COLORS = 256 # curses has 8, but white is one of them
 TABS = ["home", "setup", "peers", "consensus", "config", "unl"]
 
 def init_colors():
+    for i in range(NUM_COLORS):
+        curses.init_pair(i+1, i, curses.COLOR_WHITE)
+
+def alternate_init_colors():
     curses.start_color()
     curses.use_default_colors()
     for i in range(0, curses.COLORS):
@@ -30,6 +36,7 @@ class Interface:
         curses.use_default_colors()
         curses.noecho()
         stdscr.refresh()
+        self.original_scr = stdscr
 
         # Get screen width/height
         self.height, self.width = stdscr.getmaxyx()
@@ -40,14 +47,19 @@ class Interface:
         self.pos = 0
         self.max_rows = 32767
         self.stdscr = curses.newpad(mypad_height, self.width)
-
-        curses.noecho()
+        self.stdscr.scrollok(1)
         init_colors()
         self.stdscr.keypad(True)
+
         # Clear screen
         self.stdscr.clear()
+        
+        # How often to poll for new input
+        self.stdscr.timeout(100)
 
-        connect(stdscr)
+        # State for time-based events
+        self.last_sync_check = 0
+        self.sync_status = "unchecked"
         
         # print tabs
         self.curr_tab = TABS[0]
@@ -58,33 +70,52 @@ class Interface:
     #Allows us to use a Pad as if it were a Window by always maintaining the same height and width
     #Call this instead of self.stdscr.refresh()
     def refresh(self):
-        self.stdscr.refresh(self.pos + 2, 0, 0, 0, self.height - 1, self.width - 1)
+        height, width = self.original_scr.getmaxyx()
+        self.stdscr.refresh(self.pos + 2, 0, 0, 0, height - 1, width - 1)
         
     def run(self):
-        c = self.stdscr.getkey()
-        while(c != 'q'):
+        n = 0
+        while True:
+            #Timeout in __init__ ensures that this is non-blocking
+            try:
+                c = self.stdscr.getkey()
+            except:
+                c = "NO_INPUT"
+            
             self.stdscr.clear()
             if(c == 'q'):
                 break
             
             self.handle_key(c)
 
+            self.check_for_time_events()
+
             self.print_tabs()
             self.print_current_tab()
             self.refresh()
-            try:
-                c = self.stdscr.getkey()
-            except:
-                c = "NO_INPUT"
+
     
+    def check_for_time_events(self):
+        if(not(self.is_synced()) and self.last_sync_check + 10 < time.time()):
+            self.sync_status = check_if_synced()
+            self.last_sync_check = time.time()
+
+    def is_synced(self):
+        return (self.sync_status == "proposing") or (self.sync_status == "full") or (self.sync_status == "validating")
+
     def print_current_tab(self):
         if self.curr_tab == "config":
             generate_config_screen(self.stdscr)
-        elif self.curr_tab == "peers":
-            formatted = get_formatted_peers()
-            print_section("peers", formatted, self.stdscr, 5, 10)
+        elif(self.curr_tab == "peers"):
+            print_section("peers", get_formatted_peers(), self.stdscr, 5, 10)
         elif self.curr_tab == "unl":
             unl_screen(self.stdscr)
+        elif(self.curr_tab == "home"):
+            formatted = []
+            formatted.extend(title)
+            #TODO: Add more specific messages based on the status, rather than just displaying the status
+            formatted.append(f"Current sync status: {self.sync_status}")
+            print_section("home", formatted, self.stdscr, 5, 10)
     
     def print_tabs(self) -> None:
         column = 2
@@ -98,8 +129,8 @@ class Interface:
             row += len(tab) + 5
     
     def handle_key(self, c: str) -> None:
-        #Handle scrolling
-        if c == 'KEY_DOWN' and self.pos < self.stdscr.getyx()[0] - self.height - 1:
+        #TODO: Investigate why vertical scrolling is not updating
+        if c == 'KEY_DOWN' and self.pos < self.original_scr.getyx()[0] - self.original_scr.getmaxyx()[0] - 1:
             self.pos += 1
         elif c == 'KEY_UP' and self.pos > 0:
             self.pos -= 1
@@ -123,7 +154,6 @@ def print_section(section_name: str, return_lines: List[str], stdscr, row: int, 
         color_pair = 1
         if "Error" in line:
             color_pair = 2
-        stdscr.scrollok(1)
         stdscr.addstr(row, column, line, curses.color_pair(color_pair))
         row += 1
     row += 1

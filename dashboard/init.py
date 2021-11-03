@@ -6,7 +6,8 @@ title =  ["""__  ______  ____    _     _____ ____   ____ _____ ____  """,
           """ /  \|  _ <|  __/  | |___| |___| |_| | |_| | |___|  _ < """,
           """/_/\_\_| \_\_|     |_____|_____|____/ \____|_____|_| \_\\"""]
 
-def display_title(stdscr, msg):
+def display_title(interface, msg: str):
+    stdscr = interface.stdscr
     stdscr.clear()
 
     for i,line in enumerate(title): 
@@ -23,7 +24,7 @@ def display_title(stdscr, msg):
         curses.color_pair(85)
     )
 
-    stdscr.refresh()
+    interface.refresh()
     curses.curs_set(0)
 
 def parse_port(fp):
@@ -52,9 +53,10 @@ def find_port():
                 return parse_port(fp)
             line = fp.readline()
 
-def check_health(stdscr, addr, attempts):
+#TODO: Add this to the home screen UI
+def check_health(interface, addr: str, attempts: int):
     if attempts == 0:
-        display_title(stdscr, msg = "Failed to connect, press any key to terminate")
+        display_title(interface, msg = "Failed to connect, press 'q' to terminate")
         return
 
     data = json.dumps({"method": "server_info"})
@@ -68,41 +70,39 @@ def check_health(stdscr, addr, attempts):
         pass
 
     time.sleep(.5)
-    check_health(stdscr, addr, attempts - 1)
+    check_health(interface, addr, attempts - 1)
 
-def wait_for_sync(stdscr, addr):
+#If not synced, returns a time to check again
+def check_if_synced():
     data = json.dumps({"method": "server_info"})
     headers = {'content-type': "application/json"}
-    while True:
-        r = None
-        try:
-            r = requests.post("http://" + addr, data=data, headers=headers)
-        except:
-            pass
+    r = None
+    try:
+        r = requests.post("http://" + find_port(), data=data, headers=headers)
+    except:
+        pass
 
-        if r and r.status_code == 200:
-            response = json.loads(r.text)
-            state = response["result"]["info"]["server_state"] 
-            if (state == "proposing" or state == "full" or state == "validating"):
-                return
-            else:
-                display_title(stdscr, msg="Please wait, server is syncing, this can take up to 15 minutes")
-
-        time.sleep(10)
+    if r and r.status_code == 200:
+        response = json.loads(r.text)
+        state = response["result"]["info"]["server_state"]
+        return state
+    else:
+        return "unable to check - 'server_info' request failed"
 
 
-def connect(stdscr):
-    display_title(stdscr, msg="Validator Dashboard")
+#TODO: Add this nice boot up animation to the Home interface
+def connect(interface):
+    display_title(interface, msg="Validator Dashboard")
     admin = find_port()
     time.sleep(1)
-    display_title(stdscr, msg=("Connecting to " + admin))
+    display_title(interface, msg=("Connecting to " + admin))
     time.sleep(1)
-    check_health(stdscr, admin, 4)
-    display_title(stdscr, msg="Connected, starting application")
+    check_health(interface, admin, 4)
+    display_title(interface, msg="Connected, starting application")
     time.sleep(1)
-    wait_for_sync(stdscr, admin)
+    check_if_synced(interface, admin)
     # TODO: PUT app.start(adminPort) here
-    display_title(stdscr, msg="Server is synced")
+    display_title(interface, msg="Server is synced")
 
-    stdscr.clear()
+    interface.stdscr.clear()
 
