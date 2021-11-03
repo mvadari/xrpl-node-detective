@@ -4,11 +4,11 @@ import curses
 
 from dashboard.config import generate_config_screen
 from dashboard.peers import get_formatted_peers
-from dashboard.validations import validation_screen
+from dashboard.unl import unl_screen
 
 NUM_COLORS = 7 # curses has 8, but white is one of them
 
-TABS = ["home", "setup", "peers", "consensus", "config", "validation"]
+TABS = ["home", "setup", "peers", "consensus", "config", "unl"]
 
 def init_colors():
     for i in range(NUM_COLORS):
@@ -55,8 +55,8 @@ class Interface:
         elif self.curr_tab == "peers":
             formatted = get_formatted_peers()
             print_section("peers", formatted, self.stdscr, 5, 10)
-        elif self.curr_tab == "validation":
-            validation_screen(self.stdscr)
+        elif self.curr_tab == "unl":
+            unl_screen(self.stdscr)
     
     def print_tabs(self) -> None:
         column = 2
