@@ -48,8 +48,8 @@ def get_validator_list(filename):
         blob = jsn["blob"]
         decoded_blob = json.loads(base64.b64decode(blob))
         for validator in decoded_blob["validators"]:
-            validators.add(validator["validation_public_key"])
-    return validators
+            validators.add('- ' + validator["validation_public_key"])
+    return [f"Count: {len(validators)}"] + list(validators)
 
 
 
