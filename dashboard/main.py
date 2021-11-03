@@ -2,7 +2,6 @@ import time
 from typing import List
 
 import curses
-import dashboard.peers as peers
 from dashboard.init import check_if_synced, title
 
 from dashboard.config import generate_config_screen
@@ -106,8 +105,7 @@ class Interface:
         if self.curr_tab == "config":
             generate_config_screen(self.stdscr)
         if(self.curr_tab == "peers"):
-            formatted = peers.get_formatted_peers()
-            print_section("peers", formatted, self.stdscr, 5, 10)
+            print_section("peers", get_formatted_peers(), self.stdscr, 5, 10)
         elif self.curr_tab == "unl":
             unl_screen(self.stdscr)
         if(self.curr_tab == "home"):
