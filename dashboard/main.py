@@ -1,13 +1,14 @@
 from typing import List
 
 import curses
-import dashboard.peers as peers
 
 from dashboard.config import generate_config_screen
+from dashboard.peers import get_formatted_peers
+from dashboard.validations import validation_screen
 
 NUM_COLORS = 7 # curses has 8, but white is one of them
 
-TABS = ["home", "setup", "peers", "consensus", "config"]
+TABS = ["home", "setup", "peers", "consensus", "config", "validation"]
 
 def init_colors():
     for i in range(NUM_COLORS):
@@ -51,9 +52,11 @@ class Interface:
     def print_current_tab(self):
         if self.curr_tab == "config":
             generate_config_screen(self.stdscr)
-        elif(self.curr_tab == "peers"):
-            formatted = peers.get_formatted_peers()
+        elif self.curr_tab == "peers":
+            formatted = get_formatted_peers()
             print_section("peers", formatted, self.stdscr, 5, 10)
+        elif self.curr_tab == "validation":
+            validation_screen(self.stdscr)
     
     def print_tabs(self) -> None:
         column = 2
