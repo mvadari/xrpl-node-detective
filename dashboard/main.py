@@ -20,7 +20,22 @@ class Interface:
         return interface.run()
 
     def __init__(self, stdscr) -> None:
-        self.stdscr = stdscr
+        # Create curses screen
+        stdscr.keypad(True)
+        curses.use_default_colors()
+        curses.noecho()
+        stdscr.refresh()
+
+        # Get screen width/height
+        self.height, self.width = stdscr.getmaxyx()
+
+        # Create a curses pad (pad size is height + 10)
+        mypad_height = 32767
+        
+        self.pos = 0
+        self.max_rows = 32767
+        self.stdscr = curses.newpad(mypad_height, self.width)
+
         curses.noecho()
         init_colors()
         self.stdscr.keypad(True)
@@ -31,8 +46,13 @@ class Interface:
         self.curr_tab = TABS[0]
         self.print_tabs()
         self.print_current_tab()
-        self.stdscr.refresh()
+        self.refresh()
 
+    #Allows us to use a Pad as if it were a Window by always maintaining the same height and width
+    #Call this instead of self.stdscr.refresh()
+    def refresh(self):
+        self.stdscr.refresh(self.pos + 2, 0, 0, 0, self.height - 1, self.width - 1)
+        
     def run(self):
         c = self.stdscr.getkey()
         while(c != 'q'):
@@ -44,9 +64,11 @@ class Interface:
 
             self.print_tabs()
             self.print_current_tab()
-            self.stdscr.refresh()
-
-            c = self.stdscr.getkey()
+            self.refresh()
+            try:
+                c = self.stdscr.getkey()
+            except:
+                c = "NO_INPUT"
     
     def print_current_tab(self):
         if self.curr_tab == "config":
@@ -67,6 +89,12 @@ class Interface:
             row += len(tab) + 5
     
     def handle_key(self, c: str) -> None:
+        #Handle scrolling
+        if c == 'KEY_DOWN' and self.pos < self.stdscr.getyx()[0] - self.height - 1:
+            self.pos += 1
+        elif c == 'KEY_UP' and self.pos > 0:
+            self.pos -= 1
+
         if(c == 'KEY_LEFT'):
             self.curr_tab = TABS[TABS.index(self.curr_tab) - 1]
 
@@ -86,6 +114,7 @@ def print_section(section_name: str, return_lines: List[str], stdscr, row: int, 
         color_pair = 1
         if "Error" in line:
             color_pair = 2
+        stdscr.scrollok(1)
         stdscr.addstr(row, column, line, curses.color_pair(color_pair))
         row += 1
     row += 1
@@ -93,5 +122,4 @@ def print_section(section_name: str, return_lines: List[str], stdscr, row: int, 
 
 if __name__ == "__main__":
     curses.wrapper(Interface.start)
-
 
