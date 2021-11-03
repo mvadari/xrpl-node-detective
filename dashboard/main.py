@@ -118,15 +118,20 @@ class Interface:
             print_section("home", formatted, self.stdscr, 5, 10)
     
     def print_tabs(self) -> None:
-        column = 2
-        row = 10
+        row = 2
+        column = 10
+        tab_lens = []
 
         for i in range(len(TABS)):
             tab = TABS[i]
             if(tab == self.curr_tab):
-                tab = '**' + tab + '**'
-            self.stdscr.addstr(column, row, tab, curses.color_pair(7))
-            row += len(tab) + 5
+                tab = f"*{tab.upper()}*"
+            else:
+                tab = f" {tab} "
+            tab_box = f"|{tab}|"
+            self.stdscr.addstr(row, column, tab_box, curses.color_pair(7))
+            self.stdscr.addstr(row+1, column, "-"*len(tab_box), curses.color_pair(7))
+            column += len(tab_box) + 5
     
     def handle_key(self, c: str) -> None:
         #TODO: Investigate why vertical scrolling is not updating
