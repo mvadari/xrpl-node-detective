@@ -1,6 +1,9 @@
+import time
 from typing import List
 
 import curses
+import dashboard.peers as peers
+from dashboard.init import checkIfSynced, title, connect, displayTitle
 
 from dashboard.config import generate_config_screen
 from dashboard.peers import get_formatted_peers
@@ -46,6 +49,13 @@ class Interface:
         self.stdscr.keypad(True)
         # Clear screen
         self.stdscr.clear()
+        
+        # How often to poll for new input
+        self.stdscr.timeout(100)
+
+        # State for time-based events
+        self.last_sync_check = 0
+        self.sync_status = "unchecked"
 
         connect(stdscr)
         
@@ -61,30 +71,49 @@ class Interface:
         self.stdscr.refresh(self.pos + 2, 0, 0, 0, self.height - 1, self.width - 1)
         
     def run(self):
-        c = self.stdscr.getkey()
-        while(c != 'q'):
+        n = 0
+        while True:
+            #Timeout in __init__ ensures that this is non-blocking
+            try:
+                c = self.stdscr.getkey()
+            except:
+                c = "NO_INPUT"
+            
             self.stdscr.clear()
             if(c == 'q'):
                 break
             
             self.handle_key(c)
 
+            self.check_for_time_events()
+
             self.print_tabs()
             self.print_current_tab()
             self.refresh()
-            try:
-                c = self.stdscr.getkey()
-            except:
-                c = "NO_INPUT"
+
     
+    def check_for_time_events(self):
+        if(not(self.isSynced()) and self.last_sync_check + 10 < time.time()):
+            self.sync_status = checkIfSynced()
+            self.last_sync_check = time.time()
+
+    def isSynced(self):
+        return (self.sync_status == "proposing") or (self.sync_status == "full") or (self.sync_status == "validating")
+
     def print_current_tab(self):
         if self.curr_tab == "config":
             generate_config_screen(self.stdscr)
-        elif self.curr_tab == "peers":
-            formatted = get_formatted_peers()
+        if(self.curr_tab == "peers"):
+            formatted = peers.get_formatted_peers()
             print_section("peers", formatted, self.stdscr, 5, 10)
         elif self.curr_tab == "unl":
             unl_screen(self.stdscr)
+        if(self.curr_tab == "home"):
+            formatted = []
+            formatted.extend(title)
+            #TODO: Add more specific messages based on the status, rather than just displaying the status
+            formatted.append(f"Current sync status: {self.sync_status}")
+            print_section("home", formatted, self.stdscr, 5, 10)
     
     def print_tabs(self) -> None:
         column = 2
