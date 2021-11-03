@@ -120,8 +120,7 @@ def format_row(column_widths, entries):
 
 def format_response_for_display(response: dict[str, any]) -> List[str]:
     if(response == None or response['result']['peers'] == None):
-        formatted_lines = ['Currently no peers are connected.']
-        return formatted_lines
+        return ['Currently no peers are connected.']
     else:
         peers = response['result']['peers']
         formatted_lines: List[str] = []
