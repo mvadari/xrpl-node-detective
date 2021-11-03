@@ -33,6 +33,7 @@ class Interface:
         curses.use_default_colors()
         curses.noecho()
         stdscr.refresh()
+        self.original_scr = stdscr
 
         # Get screen width/height
         self.height, self.width = stdscr.getmaxyx()
@@ -43,6 +44,8 @@ class Interface:
         self.pos = 0
         self.max_rows = 32767
         self.stdscr = curses.newpad(mypad_height, self.width)
+        self.stdscr.scrollok(1)
+
 
         curses.noecho()
         init_colors()
@@ -68,7 +71,8 @@ class Interface:
     #Allows us to use a Pad as if it were a Window by always maintaining the same height and width
     #Call this instead of self.stdscr.refresh()
     def refresh(self):
-        self.stdscr.refresh(self.pos + 2, 0, 0, 0, self.height - 1, self.width - 1)
+        height, width = self.original_scr.getmaxyx()
+        self.stdscr.refresh(self.pos + 2, 0, 0, 0, height - 1, width - 1)
         
     def run(self):
         n = 0
@@ -152,7 +156,6 @@ def print_section(section_name: str, return_lines: List[str], stdscr, row: int, 
         color_pair = 1
         if "Error" in line:
             color_pair = 2
-        stdscr.scrollok(1)
         stdscr.addstr(row, column, line, curses.color_pair(color_pair))
         row += 1
     row += 1
