@@ -1,10 +1,15 @@
 import os, curses, time, requests, json
 
-title =  ["""__  ______  ____    _     _____ ____   ____ _____ ____  """,
-          """\ \/ /  _ \|  _ \  | |   | ____|  _ \ / ___| ____|  _ \ """,
-          """ \  /| |_) | |_) | | |   |  _| | | | | |  _|  _| | |_) |""",
-          """ /  \|  _ <|  __/  | |___| |___| |_| | |_| | |___|  _ < """,
-          """/_/\_\_| \_\_|     |_____|_____|____/ \____|_____|_| \_\\"""]
+title =  ["""                                                                      x  x    """,
+          """ _   _           _       ____       _            _   _             x        x """,
+          """| \ | | ___   __| | ___ |  _ \  ___| |_ ___  ___| |_(_)_   _____  x    \/    x""",
+          """|  \| |/ _ \ / _` |/ _ \| | | |/ _ \ __/ _ \/ __| __| \ \ / / _ \ x    /\    x""",
+          """| |\  | (_) | (_| |  __/| |_| |  __/ ||  __/ (__| |_| |\ V /  __/  x        x """,
+          """|_| \_|\___/ \__,_|\___||____/ \___|\__\___|\___|\__|_| \_/ \___|    /x/ x    """,
+          """                                                                    /x/       """,
+          """                                                                   /x/        """,
+          """                                                                  /x/         """,
+          """                                                                              """]
 
 def display_title(interface, msg: str):
     stdscr = interface.stdscr
@@ -15,13 +20,14 @@ def display_title(interface, msg: str):
             curses.LINES // 2 - len(title) // 2 + i,
             curses.COLS // 2 - len(line) // 2,
             line,
+            curses.color_pair(2)
         )
 
     stdscr.addstr(
         curses.LINES // 2 - len(title) // 2 + len(title),
         curses.COLS // 2 - len(msg) // 2,
         msg,
-        curses.color_pair(85)
+        curses.color_pair(2)
     )
 
     interface.refresh()

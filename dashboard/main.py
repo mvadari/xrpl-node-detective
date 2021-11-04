@@ -1,5 +1,5 @@
 import time
-from typing import List
+from typing import List, Optional
 
 import curses
 from dashboard.init import check_if_synced, title
@@ -113,9 +113,9 @@ class Interface:
         elif(self.curr_tab == "home"):
             formatted = []
             formatted.extend(title)
+            row, column = print_section("", formatted, self.stdscr, 5, 10, 3)
             #TODO: Add more specific messages based on the status, rather than just displaying the status
-            formatted.append(f"Current sync status: {self.sync_status}")
-            print_section("home", formatted, self.stdscr, 5, 10)
+            print_section("", [f"Current sync status: {self.sync_status}"], self.stdscr, row, column)
     
     def print_tabs(self) -> None:
         row = 2
@@ -151,15 +151,16 @@ class Interface:
                 self.curr_tab = TABS[index + 1]
 
 
-def print_section(section_name: str, return_lines: List[str], stdscr, row: int, column: int):
-    stdscr.addstr(row, column, f"***{section_name.upper()}***", curses.color_pair(3))
-    row += 2
+def print_section(section_name: str, return_lines: List[str], stdscr, row: int, column: int, color_pair_param: Optional[int] = None):
+    if section_name != "":
+        stdscr.addstr(row, column, f"***{section_name.upper()}***", curses.color_pair(3))
+        row += 2
 
     for line in return_lines:
         color_pair = 4
         if "Error" in line:
             color_pair = 2
-        stdscr.addstr(row, column, line, curses.color_pair(color_pair))
+        stdscr.addstr(row, column, line, curses.color_pair(color_pair_param or color_pair))
         row += 1
     row += 1
     return (row, column)
